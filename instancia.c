@@ -3,7 +3,15 @@
 #include "instancia.h"
 
 Instancia *lerInstancia() {
-    int i;
+    int i, j;
+
+    // número de vizinhos de saída
+    int n;
+
+    // t: índice da central para onde vai a conexão
+    // w: capacidade da conexão
+    // c: custo da conexão
+    int t, w, c;
 
     Instancia *inst;
     inst = malloc(sizeof(Instancia));
@@ -22,6 +30,35 @@ Instancia *lerInstancia() {
     for (i = 0; i < inst->l; i++)
         scanf("%d", &inst->D[i]);
 
+    // Descrição da rede seguindo esse trecho do pdf do enunciado do trabalho:
+    /*
+    Temos h + l blocos um para cada vértice da rede (h hidroelétricas e l centrais).
+    Cada bloco começa com um número de vizinhos de saída (n_i) seguido de n_i triplas
+    representando o índice da central para onde vai a conexão (t_ij), a capacidade
+    da conexão (w_ij) e o custo (c_ij)
+    */
+    inst->nArcos = 0;
+    inst->arcos = NULL;
+    for (i = 0; i < inst->h + inst->l; i++)
+    {
+        scanf("%d", &n);
+        inst->arcos = realloc(inst->arcos, (inst->nArcos + n) * sizeof(Arco));
+
+        for (j = 0; j < n; j++)
+        {
+            scanf("%d %d %d", &t, &w, &c);
+
+            inst->arcos[inst->nArcos].origem = i;
+
+            // Centrais vão de "h" a "h + l - 1"
+            inst->arcos[inst->nArcos].destino = inst->h + t - 1;
+
+            inst->arcos[inst->nArcos].capacidade = w;
+            inst->arcos[inst->nArcos].custo = c;
+            inst->nArcos++;
+        }
+    }
+
     // Imprimindo pra testar
     printf("Instância lida:\n");
     printf("h: %d, l: %d, R: %d\n", inst->h, inst->l, inst->R);
@@ -29,6 +66,15 @@ Instancia *lerInstancia() {
         printf("Hidrelétrica %d: M=%d, F=%d, C=%d\n", i, inst->M[i], inst->F[i], inst->C[i]);
     for (i = 0; i < inst->l; i++)
         printf("Central %d: D=%d\n", i, inst->D[i]);
+    printf("Arcos:\n");
+    for (i = 0; i < inst->nArcos; i++)
+        printf("Arco %d: origem=%d, destino=%d, capacidade=%d, custo=%d\n",
+               i, inst->arcos[i].origem,
+
+               // Centrais vão de "h" a "h + l - 1"
+               inst->arcos[i].destino - inst->h + 1,
+
+               inst->arcos[i].capacidade, inst->arcos[i].custo);
 
     return inst;
 }
@@ -38,5 +84,6 @@ void liberaInstancia(Instancia *inst) {
     free(inst->F);
     free(inst->C);
     free(inst->D);
+    free(inst->arcos);
     free(inst);
 }
