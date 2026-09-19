@@ -21,6 +21,9 @@ typedef struct
 
     int *D; // D[j]: demanda da central elétrica j
 
+    int *P; // P[i]: Produção da hidreletrica i
+    int *V; // V[i]: vazão usada na hidreletrica i
+
     int nArcos;
 
     // vetor com todos os arcos da rede com origem em cada vértice

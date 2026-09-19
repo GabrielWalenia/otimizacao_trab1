@@ -40,6 +40,16 @@ Instancia *lerInstancia()
     */
     inst->nArcos = 0;
     inst->arcos = NULL;
+
+    // Vetor para calcular a produção de cada hidrelétrica
+    // Calcula também o custo de operação
+    inst->P = (int *)malloc(sizeof(int) * inst->h);
+    for (int i = 0; i < inst->h; i++)
+    {
+        inst->P[i] = inst->F[i] * inst->R;
+        inst->C[i] = inst->C[i] * inst->R;
+    }
+
     for (i = 0; i < inst->h + inst->l; i++)
     {
         scanf("%d", &n);
@@ -85,10 +95,30 @@ FILE *gera_entrada(Instancia *inst)
     // Primeiro, calcular a demanda total da rede
     // Calcular a capacidade de produção da rede
     // Problema inviavel: Mais demanda do que é capaz de produzir
+    // Problema inviavel: custo alto d+?
     // Modelar o problema matematico
     // Colocar em um arquivo de forma que ele seja a entrada de lp solve
     if (!inst)
         return NULL;
+
+    int demandaTotal = 0;
+    int ProducaoTotal = 0;
+    // Calcula a demanda total da rede
+    for (int i = 0; i < inst->l; i++)
+    {
+        demandaTotal += inst->D[i];
+    }
+
+    for (int i = 0; i < inst->h; i++)
+    {
+        ProducaoTotal += inst->P[i];
+    }
+
+    if (demandaTotal > ProducaoTotal)
+    {
+        printf("Problema inviável!");
+        return NULL;
+    }
 
     return NULL;
 }
